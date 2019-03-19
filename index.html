@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> d3 </title>
+    <!-- include polyfills for custom event, Symbol and Custom Elements -->
+    <script src="//unpkg.com/babel-polyfill@6.26.0/dist/polyfill.js"></script>
+    <script src="//unpkg.com/custom-event-polyfill@0.3.0/custom-event-polyfill.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/document-register-element/1.8.0/document-register-element.js"></script>
+
+    <!-- use babel so that we can use arrow functions and other goodness in this block! -->
+    <script src="//unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script src="//unpkg.com/d3@5.5.0"></script>
+    <script src="//unpkg.com/d3fc@14.0.1"></script>
+    <script src="https://d3js.org/d3.v5.js"></script>
+  </head>
+
+  <body>
+    <script>
+
+      var parseDate = d3.timeParse("%m/%d/%Y");
+      d3.csv("liv_data.csv", function(d) {return {date: parseDate(d.Date), hood: d.Hoods, time:Number(d.Time)};})
+      .then(function(data) {
+        // var canvas = d3.select("body").append("svg")
+        //   .attr("width", 500)
+        //   .attr("height", 500)
+        //
+        // canvas.selectAll("rect")
+        //   .data(data)
+        //   .enter()
+
+
+          console.log(data[0]);
+
+          var height = 400;
+          var width = 400;
+
+          var margin
+          // var minDate = d3.min(data, function(d) { return d.Time; });
+          // console.log(minDate);
+      });
+
+
+    </script>
+  </body>
+</html>
