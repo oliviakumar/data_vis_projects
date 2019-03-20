@@ -16,42 +16,97 @@
   </head>
 
   <body>
-    <script>
+    <!-- <script> -->
 
-      var parseDate = d3.timeParse("%m/%d/%Y");
-      // d3.csv("liv_data.csv", function(d) {return {date: parseDate(d.Date), hood: d.Hoods, time:Number(d.Time)};})
-      // .then(function(data) {
-      //   // var canvas = d3.select("body").append("svg")
-      //   //   .attr("width", 500)
-      //   //   .attr("height", 500)
-      //   //
-      //   // canvas.selectAll("rect")
-      //   //   .data(data)
-      //   //   .enter()
-      //
-      //
-      //     console.log(data[0]);
-      //
-      //     var height = 400;
-      //     var width = 400;
-      //
-      //     // var margin
-          // var minDate = d3.min(data, function(d) { return d.Time; });
-          // console.log(minDate);
-      // });
-      d3.csv("liv_data.csv", (d) => ({
-        date: parseDate(d.Date),
-        hood: d.Hoods,
-        time: Number(d.Time)
-        // console.log(d.Date);
-      }))
-      .then((data) => {
+      <style>
+        body {
+          font: 12px sans-serif;
+        }
+        .area {
+          fill: #cec6b9;
+        }
+        #small-multiples > div {
+          display: inline-block;
+          height: 185px;
+          width: 50%
+        }
+        @media (min-width: 600px) {
+          #small-multiples > div {
+            width: 33%
+          }
+        }
+        @media (min-width: 800px) {
+          #small-multiples > div {
+            width: 25%
+          }
+        }
+        @media (min-width: 1000px) {
+          #small-multiples > div {
+            width: 20%
+          }
+        }
+        .tooltip .x-axis .tick {
+          display: none;
+        }
+        .x-axis .domain, .x-axis .tick path,
+        .y-axis .domain, .y-axis .tick path {
+          display: none;
+        }
+        .plot-area {
+          overflow: visible !important;
+        }
+        .x-axis {
+          height: 1.5em !important;
+        }
+        .gridline-x {
+          stroke: white;
+        }
+        .point {
+          fill: black;
+        }
+        .point text {
+          text-anchor: middle;
+          transform: translateY(-10px);
+          font-size: 10px;
+          stroke: none;
+        }
+        .bottom-handle {
+          text-anchor: middle;
+          alignment-baseline: hanging;
+         	font-size: 10px;
+          transform: translateY(1.5em);
+        }
+        .top-handle {
+          display: none;
+        }
+        .annotation-line line {
+          display: none;
+        }
+      </style>
+
+      <div id='small-multiples'></div>
+
+      <script type='text/babel'>
+
+      d3.csv("liv_data.csv")
+      // , (d) => ({
+      //   date: parseDate(d.Date),
+      //   hood: d.Hoods,
+      //   time: Number(d.Time)
+      //   // console.log(d.Date);
+      // }))
+      .then(function(data) {
+          date: parseDate(data.Date),
+          hood: data.Hoods,
+          time: Number(data.Time);
+
           var nested = d3.nest()
           .key(k => k.Hoods)
           .entries(data);
           console.log(data);
 
           nested.forEach(g => g.trackball = []);
+        })
 
         var yExtent = fc.extentLinear()
             .accessors([d => d.Date])
