@@ -22,7 +22,7 @@ var y = d3.scaleLinear()
 var line = d3.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.time); })
-    .curve(d3.curveStep)
+    // .curve(d3.curveStep)
     .context(context);
 
 context.translate(margin.left, margin.top);
