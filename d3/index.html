@@ -11,16 +11,12 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = canvas.width - margin.left - margin.right,
     height = canvas.height - margin.top - margin.bottom;
 
-var parseTime = d3.timeParse("%d-%b-%y");
-
-var n = 441;
+var parseTime = d3.timeParse("%m-%d-%y");
 
 var x = d3.scaleTime()
-    .domain([0, n-1])
     .range([0, width]);
 
 var y = d3.scaleLinear()
-    .domain([0, 1])
     .range([height, 0]);
 
 var line = d3.line()
@@ -29,8 +25,9 @@ var line = d3.line()
     .curve(d3.curveStep)
     .context(context);
 
-    context.translate(margin.left, margin.top);
+context.translate(margin.left, margin.top);
 
+// d3.tsv("liv_data_less.tsv", function(d) {
 d3.csv("liv_data.csv", function(d) {
   d.date = parseTime(d.date);
   d.time = +d.time;
@@ -69,8 +66,6 @@ function xAxis() {
     context.fillText(tickFormat(d), x(d), height + tickSize);
   });
 }
-
-svg
 
 function yAxis() {
   var tickCount = 10,
