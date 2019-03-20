@@ -77,8 +77,17 @@
 
         // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
         // var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
-        var dataset = d3.csv("liv_data.csv");
 
+        var dataset = Object.assign((await d3.csv("liv_data.csv", d3.autoType)).map(({date, close}) => ({date, value: close})), {y: "$ Close"}
+        // var dataset = d3.csv("liv_data.csv", function (data) {
+        //     if (error) throw error;
+        //     // scale the range of the data
+        //     x.domain(d3.extent(data, function (d) {
+        //         return d.year;
+        //     }));
+        //     y.domain([0, d3.max(data, function (d) {
+        //         return Math.max(d.GNI, d.PGDI, d.PPP);
+        //     })]);
         // 1
         var svg = d3.select("body").append("svg")
             .attr("width", width + margin.left + margin.right)
