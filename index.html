@@ -19,27 +19,142 @@
     <script>
 
       var parseDate = d3.timeParse("%m/%d/%Y");
-      d3.csv("liv_data.csv", function(d) {return {date: parseDate(d.Date), hood: d.Hoods, time:Number(d.Time)};})
-      .then(function(data) {
-        // var canvas = d3.select("body").append("svg")
-        //   .attr("width", 500)
-        //   .attr("height", 500)
-        //
-        // canvas.selectAll("rect")
-        //   .data(data)
-        //   .enter()
-
-
-          console.log(data[0]);
-
-          var height = 400;
-          var width = 400;
-
-          var margin
+      // d3.csv("liv_data.csv", function(d) {return {date: parseDate(d.Date), hood: d.Hoods, time:Number(d.Time)};})
+      // .then(function(data) {
+      //   // var canvas = d3.select("body").append("svg")
+      //   //   .attr("width", 500)
+      //   //   .attr("height", 500)
+      //   //
+      //   // canvas.selectAll("rect")
+      //   //   .data(data)
+      //   //   .enter()
+      //
+      //
+      //     console.log(data[0]);
+      //
+      //     var height = 400;
+      //     var width = 400;
+      //
+      //     // var margin
           // var minDate = d3.min(data, function(d) { return d.Time; });
           // console.log(minDate);
+      // });
+      d3.csv("liv_data.csv", (d) => ({
+        date: parseDate(d.Date),
+        hood: d.Hoods,
+        time: Number(d.Time)
+        // console.log(d.Date);
+      }))
+      .then((data) => {
+          var nested = d3.nest()
+          .key(k => k.Hoods)
+          .entries(data);
+          console.log(data);
+
+          nested.forEach(g => g.trackball = []);
+
+        var yExtent = fc.extentLinear()
+            .accessors([d => d.Date])
+        	.pad([0, 0.2])
+        	.include([0]);
+
+        var xExtent = fc.extentLinear()
+            .accessors([d => d.Time]);
+
+        var area = fc.seriesSvgArea()
+            .crossValue(d => d.Time)
+            .mainValue(d => d.Date);
+
+        var line = fc.seriesSvgLine()
+            .crossValue(d => d.Time)
+            .mainValue(d => d.Date);
+
+        var gridlines = fc.annotationSvgGridline()
+            .xTicks(0)
+            .yTicks(3);
+
+        var point = fc.seriesSvgPoint()
+            .crossValue(d => d.Time)
+            .mainValue(d => d.value)
+                .size(25)
+                .decorate((selection) => {
+                    selection.enter()
+                        .append('text');
+                    selection.select('text')
+                        .text(d => d.value)
+                })
+        var line = fc.annotationSvgLine()
+            .orient('vertical')
+            .value(d => d.Date)
+            .decorate((selection) => {
+                    selection.enter()
+                    .select('.bottom-handle')
+                    .append('text');
+                selection.select('.bottom-handle text')
+                    .text(d => d.Date);
+            })
+
+        var multi = fc.seriesSvgMulti()
+            .series([area, line, gridlines, line, point])
+            .mapping((data, index, series) => {
+                switch (series[index]) {
+                    case point:
+                    case line:
+                      return data.trackball;
+                    default:
+                      return data.values;
+                }
       });
 
+      var xScale = d3.scaleLinear();
+
+      var chart = fc.chartSvgCartesian(
+          xScale,
+          d3.scaleLinear())
+            .yDomain(yExtent(data))
+            .xDomain(xExtent(data))
+            .xLabel(d => d.key)
+            .yTicks(3)
+            .xTicks(2)
+            .xTickFormat(d3.format('0'))
+            .yOrient('left')
+            .plotArea(multi);
+
+    function render() {
+        var container = d3.select('#small-multiples')
+        var update = container.selectAll('div.multiple')
+            .data(nested);
+            update.enter()
+            .append('div')
+          	.classed('multiple', true)
+          	.merge(update)
+            .call(chart)
+            .classed('tooltip', d => d.trackball.length);
+
+            var pointer = fc.pointer()
+                .on('point', (event) => {
+                if (event.length) {
+                    var year = Math.round(xScale.invert(event[0].x));
+
+                    nested.forEach((group) => {
+                    var value = group.values.find(v => v.Date === year);
+
+                        group.trackball = [{
+                            year: year,
+                            value: value.Time
+                        }];
+                    })
+          } else {
+              nested.forEach(g => g.trackball = [])
+          }
+          render();
+        });
+      d3.selectAll('#small-multiples .plot-area')
+        .call(pointer);
+    }
+
+  	render();
+	});
 
     </script>
   </body>
